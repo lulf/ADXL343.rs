@@ -15,6 +15,7 @@ keywords    = ["analog-devices", "accelerometer"]
 accelerometer = "0.12"
 bitflags = "1"
 embedded-hal = "0.2"
+defmt = "0.3"
 
 [features]
 default = ["i16x3"]

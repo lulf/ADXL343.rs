@@ -164,9 +164,11 @@ where
     fn write_read_u16(&mut self, register: Register) -> Result<u16, E> {
         let mut buffer = [0u8; 2];
         self.write_read_register(register, &mut buffer)?;
-        Ok(u16::from_le_bytes(buffer))
+        Ok(u16::from_be_bytes(buffer))
     }
 }
+
+const ADXL345_SCALE_FACTOR: f32 = 0.0039;
 
 #[cfg(feature = "i16x3")]
 impl<I2C, E> Accelerometer for Adxl343<I2C>
@@ -179,11 +181,11 @@ where
     /// Get normalized ±g reading from the accelerometer.
     fn accel_norm(&mut self) -> Result<F32x3, Error<E>> {
         let raw_data: I16x3 = self.accel_raw()?;
-        let range: f32 = self.data_format.range().into();
+        let range: f32 = (self.data_format.range().raw() >> 1) as f32;
 
-        let x = (raw_data.x as f32 / core::i16::MAX as f32) * range;
-        let y = (raw_data.y as f32 / core::i16::MAX as f32) * range;
-        let z = (raw_data.z as f32 / core::i16::MAX as f32) * range;
+        let x = raw_data.x as f32 * ADXL345_SCALE_FACTOR * range;
+        let y = raw_data.y as f32 * ADXL345_SCALE_FACTOR * range;
+        let z = raw_data.z as f32 * ADXL345_SCALE_FACTOR * range;
 
         Ok(F32x3::new(x, y, z))
     }

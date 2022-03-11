@@ -354,19 +354,18 @@ impl From<DataFormatRange> for DataFormatFlags {
 /// g-Range setting flags which can be OR'd with `DataFormatFlags` and passed as
 /// operands to `Register::DATA_FORMAT`
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-#[repr(u8)]
 pub enum DataFormatRange {
     /// ±2g
-    PLUSMINUS_2G = 0b00,
+    PLUSMINUS_2G,
 
     /// ±4g
-    PLUSMINUS_4G = 0b01,
+    PLUSMINUS_4G,
 
     /// ±8g
-    PLUSMINUS_8G = 0b10,
+    PLUSMINUS_8G,
 
     /// ±16g
-    PLUSMINUS_16G = 0b11,
+    PLUSMINUS_16G,
 }
 
 impl DataFormatRange {
@@ -377,6 +376,15 @@ impl DataFormatRange {
             DataFormatRange::PLUSMINUS_4G => DataFormatFlags::RANGE_LO,
             DataFormatRange::PLUSMINUS_8G => DataFormatFlags::RANGE_HI,
             DataFormatRange::PLUSMINUS_16G => DataFormatFlags::RANGE_HI | DataFormatFlags::RANGE_LO,
+        }
+    }
+
+    pub fn raw(&self) -> u8 {
+        match self {
+            DataFormatRange::PLUSMINUS_2G => 2,
+            DataFormatRange::PLUSMINUS_4G => 4,
+            DataFormatRange::PLUSMINUS_8G => 8,
+            DataFormatRange::PLUSMINUS_16G => 16,
         }
     }
 }
