@@ -77,7 +77,6 @@ where
         // Disable interrupts
         adxl343.write_register(Register::INT_ENABLE, 0)?;
 
-        /*
         // 62.5 mg/LSB
         adxl343.write_register(Register::THRESH_TAP, 20)?;
 
@@ -92,7 +91,6 @@ where
 
         // Enable XYZ axis for tap
         adxl343.write_register(Register::TAP_AXES, 0x7)?;
-        */
 
         // Enable measurements
         adxl343.write_register(Register::POWER_CTL, 0x08)?;
@@ -152,7 +150,7 @@ where
     fn write_read_i16(&mut self, register: Register) -> Result<i16, E> {
         let mut buffer = [0u8; 2];
         self.write_read_register(register, &mut buffer)?;
-        Ok(i16::from_be_bytes(buffer))
+        Ok(i16::from_le_bytes(buffer))
     }
 
     /// Write to a given register, then read a `u16` result
@@ -184,8 +182,6 @@ where
     fn accel_norm(&mut self) -> Result<F32x3, Error<E>> {
         let raw_data: I16x3 = self.accel_raw()?;
         let range: f32 = (self.data_format.range().raw() >> 1) as f32;
-
-        defmt::info!("RANGE: {}", self.data_format.range().raw() as u8);
 
         let x = raw_data.x as f32 * ADXL345_SCALE_FACTOR * range;
         let y = raw_data.y as f32 * ADXL345_SCALE_FACTOR * range;
